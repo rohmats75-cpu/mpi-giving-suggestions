@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giving Suggestions — The Solution Squad</title>
+<style>
+:root{--navy:#12213f;--blue:#2563eb;--cyan:#38bdf8;--mint:#34d399;--cream:#f8fafc;--ink:#18243b;--muted:#64748b;--coral:#fb7185;--gold:#fbbf24}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(145deg,#0f1c38,#173b68 55%,#176b7a);color:var(--ink);min-height:100vh}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{max-width:1100px;margin:auto;padding:18px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;color:white;margin:4px 0 16px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:.2px}
+.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--gold),var(--coral));display:grid;place-items:center;font-size:24px;box-shadow:0 8px 24px #0003}
+.progress-wrap{min-width:170px;max-width:280px;flex:1;margin-left:auto}
+.progress-label{display:flex;justify-content:space-between;font-size:12px;color:#dbeafe;margin-bottom:6px}
+.progress{height:8px;border-radius:99px;background:#ffffff30;overflow:hidden}
+.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--mint),var(--cyan));transition:width .3s}
+main{background:var(--cream);border-radius:26px;overflow:hidden;box-shadow:0 24px 70px #06122b70;min-height:650px}
+.hero{padding:30px 32px;background:radial-gradient(circle at 85% 10%,#67e8f955,transparent 28%),linear-gradient(120deg,#e0f2fe,#eef2ff 60%,#dcfce7);position:relative;overflow:hidden}
+.eyebrow{display:inline-block;background:white;color:#1d4ed8;font-weight:800;font-size:12px;letter-spacing:1.4px;padding:7px 11px;border-radius:99px}
+.hero h1{font-size:clamp(32px,5vw,54px);line-height:1.02;margin:15px 0 12px;color:var(--navy);max-width:620px}
+.hero p{font-size:17px;line-height:1.6;max-width:620px;color:#334155;margin:0}
+.hero-art{position:absolute;right:5%;top:30px;font-size:clamp(90px,15vw,160px);filter:drop-shadow(0 12px 10px #0f172a20);transform:rotate(-7deg)}
+.content{padding:26px 32px 32px}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.nav button{border:1px solid #dbe4f0;background:white;border-radius:12px;padding:10px 14px;font-weight:750;color:#475569}
+.nav button.active{background:var(--navy);color:white;border-color:var(--navy)}
+.screen{display:none;animation:rise .25s ease}
+.screen.active{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+h2{color:var(--navy);font-size:28px;margin:0 0 8px}
+.lead{color:var(--muted);line-height:1.6;margin:0 0 22px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.card{background:white;border:1px solid #e2e8f0;border-radius:18px;padding:18px;box-shadow:0 5px 16px #0f172a08}
+.card h3{margin:0 0 8px;color:#1e3a8a;font-size:18px}
+.card p{line-height:1.55;margin:0;color:#475569}
+.pill{display:inline-block;background:#dbeafe;color:#1d4ed8;border-radius:99px;padding:5px 9px;font-size:12px;font-weight:800;margin-bottom:10px}
+.callout{background:#eff6ff;border-left:4px solid var(--blue);padding:14px 16px;border-radius:10px;line-height:1.6;margin:16px 0}
+.two-col{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:start}
+.dialogue{background:#fff;border:1px solid #dbe4f0;border-radius:18px;padding:18px}
+.bubble{padding:12px 14px;border-radius:14px;margin:9px 0;max-width:92%;line-height:1.5}
+.bubble.a{background:#dbeafe;border-bottom-left-radius:4px}
+.bubble.b{background:#dcfce7;border-bottom-right-radius:4px;margin-left:auto}
+.speaker{font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.7px;color:#475569;margin-bottom:3px}
+.table{width:100%;border-collapse:collapse;background:white;border-radius:14px;overflow:hidden}
+.table th,.table td{text-align:left;padding:12px;border-bottom:1px solid #e2e8f0;vertical-align:top;line-height:1.45}
+.table th{background:#eaf2ff;color:#1e3a8a}
+.table tr:last-child td{border-bottom:0}
+.tip{font-size:13px;color:#64748b;margin-top:10px;line-height:1.5}
+.btn{border:0;border-radius:12px;padding:12px 17px;font-weight:800;transition:transform .15s,filter .15s}
+.btn:hover{filter:brightness(1.04);transform:translateY(-1px)}
+.primary{background:var(--blue);color:white;box-shadow:0 6px 14px #2563eb30}
+.secondary{background:#e2e8f0;color:#1e293b}
+.success{background:#059669;color:white}
+.warning{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.problem{display:flex;gap:14px;align-items:flex-start;background:white;border:1px solid #e2e8f0;border-radius:16px;padding:16px;margin-bottom:12px}
+.problem .emoji{font-size:35px;line-height:1}
+.problem p{margin:5px 0 0;color:#64748b;line-height:1.5}
+.question{background:white;border:1px solid #e2e8f0;border-radius:18px;padding:20px;margin:16px 0}
+.qnum{font-size:12px;font-weight:850;letter-spacing:1px;color:#2563eb;text-transform:uppercase}
+.question h3{margin:7px 0 14px;line-height:1.5}
+.options{display:grid;gap:9px}
+.option{display:flex;align-items:flex-start;gap:10px;border:1.5px solid #dbe4f0;border-radius:12px;padding:12px;cursor:pointer;line-height:1.45;background:#fff}
+.option:hover{border-color:#60a5fa;background:#f8fbff}
+.option input{margin-top:4px;accent-color:#2563eb}
+.feedback{display:none;margin-top:12px;padding:11px 13px;border-radius:10px;line-height:1.5}
+.feedback.show{display:block}
+.feedback.good{background:#dcfce7;color:#166534}
+.feedback.bad{background:#fff7ed;color:#9a3412}
+select,textarea{width:100%;padding:12px;border:1.5px solid #cbd5e1;border-radius:12px;background:white;color:#172554}
+textarea{min-height:100px;resize:vertical;line-height:1.5}
+.label{font-size:13px;font-weight:800;color:#334155;display:block;margin:13px 0 7px}
+.result{display:none;text-align:center;background:linear-gradient(135deg,#dbeafe,#dcfce7);padding:25px;border-radius:20px;margin-top:18px}
+.result.show{display:block}
+.score{font-size:48px;font-weight:900;color:#1d4ed8}
+footer{color:#dbeafe;text-align:center;font-size:12px;padding:16px 0 6px}
+.small{font-size:13px;color:#64748b;line-height:1.5}
+@media(max-width:720px){.app{padding:10px}.hero{padding:24px 20px}.hero-art{opacity:.18;right:2%;top:18px}.hero p{max-width:100%}.content{padding:20px 16px 24px}.grid,.two-col{grid-template-columns:1fr}.topbar{flex-wrap:wrap}.progress-wrap{min-width:120px}.nav button{flex:1;padding:9px 7px;font-size:12px}main{border-radius:20px}.table th,.table td{padding:9px;font-size:13px}}
+@media print{body{background:white}.topbar,.nav,.actions,footer{display:none!important}main{box-shadow:none}.screen{display:block!important;page-break-inside:avoid}.hero-art{display:none}.app{max-width:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="logo">💡</div><div>THE SOLUTION SQUAD<br><span style="font-size:11px;font-weight:500;color:#bfdbfe">English Interactive Learning · Grade 9</span></div></div>
+    <div class="progress-wrap"><div class="progress-label"><span>Your mission progress</span><strong id="progressText">1 / 5</strong></div><div class="progress"><div id="progressBar"></div></div></div>
+  </header>
+  <main>
+    <section class="hero">
+      <span class="eyebrow">MISSION: GIVE GOOD ADVICE</span>
+      <h1>Giving<br>Suggestions</h1>
+      <p>Help your friends solve everyday problems. Explore useful expressions, discover grammar patterns, and complete the Suggestion Challenge!</p>
+      <div class="hero-art" aria-hidden="true">🧠💬</div>
+    </section>
+    <div class="content">
+      <nav class="nav" aria-label="Learning sections">
+        <button class="active" data-screen="start">🚀 Start</button>
+        <button data-screen="discover">🔎 Discover</button>
+        <button data-screen="language">📘 Language Lab</button>
+        <button data-screen="mission">🎯 Mission</button>
+        <button data-screen="quiz">🏆 Quiz</button>
+      </nav>
+
+      <section id="start" class="screen active">
+        <h2>Ready to be a Solution Squad member?</h2>
+        <p class="lead">By the end of this mission, you will be able to ask for suggestions, give helpful advice, and respond politely in everyday conversations.</p>
+        <div class="grid">
+          <article class="card"><span class="pill">MISSION 01</span><h3>🔍 Notice the problem</h3><p>Understand what your friend is experiencing before offering advice.</p></article>
+          <article class="card"><span class="pill">MISSION 02</span><h3>💬 Choose your words</h3><p>Use natural English expressions to suggest possible solutions.</p></article>
+          <article class="card"><span class="pill">MISSION 03</span><h3>🤝 Respond kindly</h3><p>Accept or reject a suggestion politely and respectfully.</p></article>
+          <article class="card"><span class="pill">MISSION 04</span><h3>🎤 Speak up</h3><p>Create and perform a short dialogue with a partner.</p></article>
+        </div>
+        <div class="callout"><strong>Warm-up question:</strong> Your friend says, “I have an English test tomorrow, and I feel nervous.”<br>What could you say to help? Think of one idea before you continue.</div>
+        <div class="actions"><button class="btn primary" onclick="go('discover')">Start the mission →</button></div>
+      </section>
+
+      <section id="discover" class="screen">
+        <h2>Discover the expressions</h2>
+        <p class="lead">Read the conversation. Look for the problem, the suggestions, and the responses.</p>
+        <div class="two-col">
+          <div class="dialogue" aria-label="Example dialogue">
+            <div class="bubble a"><div class="speaker">Andi</div>Hi, Budi. You look worried. What's wrong?</div>
+            <div class="bubble b"><div class="speaker">Budi</div>I have an English test tomorrow, but I don't understand the lesson.</div>
+            <div class="bubble a"><div class="speaker">Andi</div>Why don't you review your notes and practice some questions?</div>
+            <div class="bubble b"><div class="speaker">Budi</div>That's a good idea! Should I study all night?</div>
+            <div class="bubble a"><div class="speaker">Andi</div>No, you shouldn't. You should get enough sleep, too.</div>
+            <div class="bubble b"><div class="speaker">Budi</div>You're right. Thanks for your suggestions!</div>
+          </div>
+          <div>
+            <div class="card"><span class="pill">THINK ABOUT IT</span><h3>Can you spot them?</h3><p><strong>Problem:</strong> Budi does not understand the lesson and feels worried.</p><p style="margin-top:10px"><strong>Giving a suggestion:</strong> “Why don't you review your notes...?”</p><p style="margin-top:10px"><strong>Accepting a suggestion:</strong> “That's a good idea!”</p><p style="margin-top:10px"><strong>Giving advice with should:</strong> “You should get enough sleep.”</p></div>
+            <div class="callout"><strong>Remember:</strong> A good suggestion is relevant, helpful, and polite. We can offer an idea, but the other person can decide whether to follow it.</div>
+          </div>
+        </div>
+        <div class="actions"><button class="btn secondary" onclick="go('start')">← Back</button><button class="btn primary" onclick="go('language')">Explore the language →</button></div>
+      </section>
+
+      <section id="language" class="screen">
+        <h2>Language Lab</h2>
+        <p class="lead">Explore four useful functions and learn the patterns. Tap each example aloud to practise speaking.</p>
+        <div class="grid">
+          <article class="card"><span class="pill">1 · ASKING</span><h3>Asking for suggestions</h3><p>“What should I do?”<br>“Do you have any suggestions?”<br>“What do you think I should do?”</p><div class="actions"><button class="btn secondary" onclick="speak('What should I do?')">🔊 Listen</button></div></article>
+          <article class="card"><span class="pill">2 · GIVING</span><h3>Giving suggestions</h3><p>“You should ask your teacher.”<br>“Why don't you take a break?”<br>“How about studying together?”<br>“Let's practise together.”</p><div class="actions"><button class="btn secondary" onclick="speak('Why don’t you take a break?')">🔊 Listen</button></div></article>
+          <article class="card"><span class="pill">3 · ACCEPTING</span><h3>Accepting suggestions</h3><p>“That's a good idea!”<br>“Thanks for your suggestion.”<br>“I'll try that.”<br>“That sounds helpful.”</p><div class="actions"><button class="btn secondary" onclick="speak('That sounds helpful.')">🔊 Listen</button></div></article>
+          <article class="card"><span class="pill">4 · RESPONDING</span><h3>Declining politely</h3><p>“Thanks, but I'd rather try another way.”<br>“That's kind of you, but I don't think I can do that.”</p><div class="actions"><button class="btn secondary" onclick="speak('Thanks, but I’d rather try another way.')">🔊 Listen</button></div></article>
+        </div>
+        <h2 style="margin-top:28px">Grammar patterns</h2>
+        <div style="overflow-x:auto;margin-top:12px">
+          <table class="table"><thead><tr><th>Expression</th><th>Pattern</th><th>Example</th></tr></thead><tbody>
+          <tr><td><strong>Should</strong></td><td>should + base verb (V1)</td><td>You should <strong>rest</strong>.</td></tr>
+          <tr><td><strong>Ought to</strong></td><td>ought to + V1</td><td>You ought to <strong>ask</strong> for help.</td></tr>
+          <tr><td><strong>Why don't you…?</strong></td><td>Why don't you + V1?</td><td>Why don't you <strong>talk</strong> to her?</td></tr>
+          <tr><td><strong>How/What about…?</strong></td><td>How/What about + verb-ing?</td><td>How about <strong>studying</strong> together?</td></tr>
+          <tr><td><strong>Let's…</strong></td><td>Let's + V1</td><td>Let's <strong>practise</strong> together.</td></tr>
+          <tr><td><strong>If I were you…</strong></td><td>If I were you, I would + V1</td><td>If I were you, I would <strong>apologise</strong>.</td></tr>
+          </tbody></table>
+        </div>
+        <div class="callout"><strong>Grammar alert!</strong><br>❌ You should to study. → ✅ You should study.<br>❌ How about study together? → ✅ How about studying together?</div>
+        <div class="actions"><button class="btn secondary" onclick="go('discover')">← Back</button><button class="btn primary" onclick="go('mission')">Take the challenge →</button></div>
+      </section>
+
+      <section id="mission" class="screen">
+        <h2>Suggestion Challenge 🎯</h2>
+        <p class="lead">Choose a real-life problem. Work with a partner: Student A explains the problem; Student B offers at least two suggestions. Then switch roles.</p>
+        <div class="grid">
+          <article class="card"><span class="pill">CHALLENGE A</span><h3>📚 Exam stress</h3><p>Your friend is worried about an English test tomorrow.</p><button class="btn secondary" style="margin-top:14px" onclick="chooseScenario('exam')">Use this scenario</button></article>
+          <article class="card"><span class="pill">CHALLENGE B</span><h3>🕒 Time management</h3><p>Your friend often forgets to do homework and arrives late.</p><button class="btn secondary" style="margin-top:14px" onclick="chooseScenario('time')">Use this scenario</button></article>
+          <article class="card"><span class="pill">CHALLENGE C</span><h3>😴 Healthy lifestyle</h3><p>Your friend sleeps late and feels tired at school.</p><button class="btn secondary" style="margin-top:14px" onclick="chooseScenario('health')">Use this scenario</button></article>
+          <article class="card"><span class="pill">CHALLENGE D</span><h3>🤝 Friendship</h3><p>Your friend had an argument with a classmate and wants to make things better.</p><button class="btn secondary" style="margin-top:14px" onclick="chooseScenario('friend')">Use this scenario</button></article>
+        </div>
+        <div class="card" style="margin-top:18px">
+          <span class="pill">DIALOGUE BUILDER</span><h3 id="scenarioTitle">Choose a scenario above</h3><p id="scenarioProblem">Your selected problem will appear here.</p>
+          <label class="label" for="line1">Student A — explain the problem</label><textarea id="line1" placeholder="I have a problem. I feel worried because..."></textarea>
+          <label class="label" for="line2">Student B — give suggestion 1</label><textarea id="line2" placeholder="Why don't you...?"></textarea>
+          <label class="label" for="line3">Student A — respond</label><textarea id="line3" placeholder="That's a good idea! / Thanks, but..."></textarea>
+          <label class="label" for="line4">Student B — give suggestion 2</label><textarea id="line4" placeholder="You should... / How about ...ing?"></textarea>
+          <label class="label" for="line5">Student A — final response</label><textarea id="line5" placeholder="I'll try that. Thank you!"></textarea>
+          <div class="actions"><button class="btn primary" onclick="showDialogue()">Preview my dialogue</button><button class="btn secondary" onclick="clearDialogue()">Clear</button></div>
+          <div id="dialoguePreview" class="callout" style="display:none;white-space:pre-line"></div>
+        </div>
+        <div class="actions"><button class="btn secondary" onclick="go('language')">← Back</button><button class="btn primary" onclick="go('quiz')">Take the quiz →</button></div>
+      </section>
+
+      <section id="quiz" class="screen">
+        <h2>Final Mission: Quick Quiz 🏆</h2>
+        <p class="lead">Choose the best answer for each question. You will receive instant feedback and a score at the end.</p>
+        <div id="quizQuestions"></div>
+        <div class="actions"><button class="btn primary" id="checkBtn" onclick="checkQuiz()">Check my answers</button><button class="btn secondary" onclick="resetQuiz()">Try again</button></div>
+        <div id="quizResult" class="result" aria-live="polite"></div>
+        <div class="card" style="margin-top:22px"><span class="pill">EXIT TICKET</span><h3>Reflect on your learning</h3><label class="label" for="reflection">Complete the sentence: “One suggestion I can give my friend is…”</label><textarea id="reflection" placeholder="One suggestion I can give my friend is..."></textarea><div class="actions"><button class="btn success" onclick="saveReflection()">Save reflection on this device</button><button class="btn secondary" onclick="window.print()">Print learning summary</button></div><p class="small" id="reflectionStatus">Your reflection stays in this browser only; it is not sent to your teacher.</p></div>
+        <div class="actions"><button class="btn secondary" onclick="go('mission')">← Back to mission</button><button class="btn primary" onclick="go('start')">↻ Start again</button></div>
+      </section>
+    </div>
+  </main>
+  <footer>THE SOLUTION SQUAD · Giving Suggestions · English Grade 9 · Learn, practise, help each other.</footer>
+</div>
+<script>
+const screens=['start','discover','language','mission','quiz'];
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.screen===id));
+  const idx=screens.indexOf(id);document.getElementById('progressText').textContent=(idx+1)+' / '+screens.length;
+  document.getElementById('progressBar').style.width=((idx+1)/screens.length*100)+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.screen)));
+function speak(text){if(!('speechSynthesis'in window)){alert('Audio pronunciation is not supported in this browser.');return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=.88;speechSynthesis.speak(u)}
+const scenarios={
+ exam:{title:'Exam stress',problem:'Your friend is worried about an English test tomorrow.'},
+ time:{title:'Time management',problem:'Your friend often forgets to do homework and arrives late.'},
+ health:{title:'Healthy lifestyle',problem:'Your friend sleeps late and feels tired at school.'},
+ friend:{title:'Friendship',problem:'Your friend had an argument with a classmate and wants to make things better.'}
+};
+function chooseScenario(key){document.getElementById('scenarioTitle').textContent=scenarios[key].title;document.getElementById('scenarioProblem').textContent=scenarios[key].problem;document.querySelectorAll('#mission .grid .card').forEach(c=>c.style.borderColor='#e2e8f0');event.currentTarget.closest('.card').style.borderColor='#2563eb'}
+function showDialogue(){
+ const vals=[['Student A',line1.value],['Student B',line2.value],['Student A',line3.value],['Student B',line4.value],['Student A',line5.value]];
+ const out=vals.filter(x=>x[1].trim()).map(x=>x[0]+': '+x[1].trim()).join('\\n\\n');
+ const p=document.getElementById('dialoguePreview');p.style.display='block';p.textContent=out||'Write at least one line to preview your dialogue.';
+}
+function clearDialogue(){['line1','line2','line3','line4','line5'].forEach(id=>document.getElementById(id).value='');document.getElementById('dialoguePreview').style.display='none'}
+const questions=[
+ {q:'Your friend says, “I am very tired because I slept late.” What is the best suggestion?',o:['You should sleep earlier tonight.','You should to sleep earlier tonight.','How about sleep earlier tonight?','You must tired.'],a:0,e:'Use should + the base form of the verb: “You should sleep earlier tonight.”'},
+ {q:'Which sentence is grammatically correct?',o:['How about to study together?','How about studying together?','How about study together?','How about studied together?'],a:1,e:'Use How about + verb-ing: “How about studying together?”'},
+ {q:'Your friend suggests joining a study group. You agree. What can you say?',o:['That sounds helpful!','I don’t care you.','You should joining.','Why you do that?'],a:0,e:'“That sounds helpful!” is a natural way to accept a suggestion.'},
+ {q:'Which expression asks someone for a suggestion?',o:['You ought to rest.','That’s a good idea.','What should I do?','Let’s go together.'],a:2,e:'“What should I do?” asks another person for advice or a suggestion.'},
+ {q:'Choose the most polite way to reject a suggestion.',o:['That is a stupid idea.','No! Be quiet.','Thanks, but I’d rather try another way.','Your suggestion is terrible.'],a:2,e:'Acknowledge the other person and explain your preference politely.'},
+ {q:'Complete the sentence: “You should _____ your teacher for help.”',o:['asking','asked','to ask','ask'],a:3,e:'After should, use the base form (V1): “should ask.”'},
+ {q:'Which sentence gives a suggestion for doing something together?',o:['Let’s practise together.','I practised yesterday.','She is practising now.','They practise every day.'],a:0,e:'“Let’s + base verb” suggests doing an activity together.'},
+ {q:'Complete the sentence: “What about _____ a short break?”',o:['take','to take','taking','took'],a:2,e:'Use What about + verb-ing: “What about taking a short break?”'}
+];
+function renderQuiz(){
+ const root=document.getElementById('quizQuestions');
+ root.innerHTML=questions.map((q,i)=>`<div class="question" id="question${i}"><div class="qnum">Question ${i+1} of ${questions.length}</div><h3>${q.q}</h3><div class="options">${q.o.map((op,j)=>`<label class="option"><input type="radio" name="q${i}" value="${j}"><span><strong>${String.fromCharCode(65+j)}.</strong> ${op}</span></label>`).join('')}</div><div class="feedback" id="feedback${i}"></div></div>`).join('');
+}
+function checkQuiz(){
+ let score=0,answered=0;
+ questions.forEach((q,i)=>{
+  const chosen=document.querySelector(`input[name="q${i}"]:checked`),fb=document.getElementById('feedback'+i);
+  fb.className='feedback show';
+  if(chosen){answered++;if(Number(chosen.value)===q.a){score++;fb.classList.add('good');fb.textContent='Correct! '+q.e}else{fb.classList.add('bad');fb.textContent='Not quite. '+q.e}}
+  else{fb.classList.add('bad');fb.textContent='Please review this question. '+q.e}
+ });
+ const percent=Math.round(score/questions.length*100),result=document.getElementById('quizResult');
+ result.className='result show';result.innerHTML=`<div class="score">${score}/${questions.length}</div><h3>${percent>=88?'Excellent work, Solution Squad!':percent>=70?'Great effort! Keep practising.':'Good start! Review the Language Lab and try again.'}</h3><p>You answered ${answered} of ${questions.length} questions. Score: <strong>${percent}%</strong></p>`;
+ document.getElementById('checkBtn').textContent='Update my score';result.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQuiz(){document.querySelectorAll('#quizQuestions input').forEach(i=>i.checked=false);document.querySelectorAll('#quizQuestions .feedback').forEach(f=>{f.className='feedback';f.textContent=''});const r=document.getElementById('quizResult');r.className='result';r.innerHTML='';document.getElementById('checkBtn').textContent='Check my answers'}
+function saveReflection(){const val=document.getElementById('reflection').value.trim();if(!val){document.getElementById('reflectionStatus').textContent='Please write your reflection first.';return}try{localStorage.setItem('givingSuggestionsReflection',val);document.getElementById('reflectionStatus').textContent='Reflection saved in this browser. Great work!'}catch(e){document.getElementById('reflectionStatus').textContent='Your reflection is written above. You can print it or copy it into your notes.'}}
+renderQuiz();document.getElementById('progressBar').style.width='20%';
+try{const saved=localStorage.getItem('givingSuggestionsReflection');if(saved)document.getElementById('reflection').value=saved}catch(e){}
+</script>
+</body>
+</html>
